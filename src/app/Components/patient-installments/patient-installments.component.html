@@ -1,0 +1,81 @@
+@if(isLoading){
+  <div class="spinner-container">
+    <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
+  </div>
+}
+<div class="container" appDisableRightClick>
+  <div class="d-flex justify-content-between">
+    <button mat-raised-button [ngStyle]="{ 'background-color': getThemeColor(), 'color':'#fff'}" (click)="openAddEditDialog()">
+      {{ 'ADD_INSTALLMENT' | translate }}
+    </button>
+    <div class="col-md-6 d-flex align-items-center">
+      <mat-form-field class="w-100" appearance="fill">
+        <mat-label>{{ 'SEARCH_BY_PATIENT_NAME' | translate }}</mat-label>
+        <input matInput [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()"
+          placeholder="{{ 'SEARCH_PLACEHOLDER' | translate }}">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+    <!-- Column for index -->
+    <ng-container matColumnDef="index">
+      <mat-header-cell *matHeaderCellDef>#</mat-header-cell>
+      <mat-cell *matCellDef="let element; let i = index">{{  i + 1 + paginator.pageIndex * paginator.pageSize}}</mat-cell>
+    </ng-container>
+    <!-- Column for patientName -->
+    <ng-container matColumnDef="patientName">
+      <mat-header-cell *matHeaderCellDef>{{ 'PATIENT_NAME' | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.patientName }}</mat-cell>
+    </ng-container>
+
+    <!-- Column for amount -->
+    <ng-container matColumnDef="amount">
+      <mat-header-cell *matHeaderCellDef>{{ 'TOTAL_AMOUNT' | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.amount }}</mat-cell>
+    </ng-container>
+
+    <!-- Column for dueDate -->
+    <ng-container matColumnDef="dueDate">
+      <mat-header-cell *matHeaderCellDef>{{ 'DUE_DATE' | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let element" [appDateFormat]="'dd/MM/yyyy'" [dateValue]="element.dueDate">
+        {{ element.dueDate }}
+      </mat-cell>
+    </ng-container>    
+    
+    <!-- Column for description -->
+    <ng-container matColumnDef="description">
+      <mat-header-cell *matHeaderCellDef>{{ 'DESCRIPTION' | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let element">{{ element.description }}</mat-cell>
+    </ng-container>
+
+    <!-- Column for actions -->
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef>{{ 'ACTIONS' | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <button mat-icon-button color="primary" (click)="openAddEditDialog(element)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="confirmDelete(element.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <!-- Column for details -->
+    <ng-container matColumnDef="details">
+      <mat-header-cell *matHeaderCellDef>{{ 'INSTALLMENT_DETAILS' | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <button mat-button color="accent" (click)="viewInstallmentDetails(element)">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <!-- Header and row definitions -->
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+</div>

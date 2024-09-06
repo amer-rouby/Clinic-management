@@ -1,0 +1,85 @@
+@if(loadingData) {
+<div class="spinner-container">
+    <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
+</div>
+}
+
+<div class="add-dental-form" appDisableRightClick>
+    <div class="dialog-header d-flex justify-content-end">
+        <h2 class="m-auto header">{{ ADD_OR_MODIFY_BUTTON | translate | uppercase }}</h2>
+        <button class="close-button" mat-icon-button (click)="onClose()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <form [formGroup]="addDentalForm" class="m-4" (ngSubmit)="addDentalClinic()">
+        <mat-form-field appearance="fill" class="full-width col-md-12">
+            <mat-label>{{ 'ADD_TITLE' | translate }}</mat-label>
+            <input matInput placeholder="{{ 'ADD_TITLE' | translate }}" formControlName="title">
+            @if(addDentalForm.get('title')?.errors?.['required']){
+                <mat-error>
+                    {{ 'TITLE_REQUIRED' | translate }}
+                </mat-error>
+            }
+        </mat-form-field>
+
+        <!-- Description Input -->
+        <mat-form-field appearance="fill" class="full-width col-md-12">
+            <mat-label>{{ 'ADD_DESCRIPTION' | translate }}</mat-label>
+            <input matInput placeholder="{{ 'ADD_DESCRIPTION' | translate }}" formControlName="description">
+            @if(addDentalForm.get('description')?.errors?.['required']){
+                <mat-error>
+                    {{ 'DESCRIPTION_REQUIRED' | translate }}
+                </mat-error>
+            }
+        </mat-form-field>
+
+        <!-- Phone number input -->
+        <mat-form-field appearance="fill" class="full-width col-md-12">
+            <mat-label>{{ 'ADD_PHONE_NUMBER' | translate }}</mat-label>
+            <input matInput placeholder="{{ 'ADD_PHONE_NUMBER' | translate }}" formControlName="phoneNumber">
+            @if(addDentalForm.get('phoneNumber')?.errors?.['required']){
+                <mat-error>
+                    {{ 'PHONE_NUMBER_REQUIRED' | translate }}
+                </mat-error>
+            }
+            @if(addDentalForm.get('phoneNumber')?.errors?.['pattern']){
+                <mat-error>
+                    {{ 'INVALID_PHONE_NUMBER' | translate }}
+                </mat-error>
+            }
+            @if(addDentalForm.get('phoneNumber')?.hasError('minlength') ||
+                addDentalForm.get('phoneNumber')?.hasError('maxlength')){
+                <mat-error>
+                    {{ 'PHONE_NUMBER_LENGTH' | translate }}
+                </mat-error>
+            }
+        </mat-form-field>
+        <!-- Date Input -->
+        <mat-form-field appearance="fill" class="full-width col-md-12">
+            <mat-label>{{ 'CHOOSE_DATE' | translate }}</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            @if(addDentalForm.get('date')?.errors?.['required']){
+                <mat-error>
+                    {{ 'DATE_REQUIRED' | translate }}
+                </mat-error>
+            }
+            @if(addDentalForm.get('date')?.errors?.['futureDate']){
+                <mat-error>
+                    {{ 'DATE_CANNOT_BE_IN_FUTURE' | translate }}
+                </mat-error>
+            }
+        </mat-form-field>
+
+        <!-- Completed toggle -->
+        <mat-slide-toggle formControlName="completed">{{ 'COMPLETE' | translate }}</mat-slide-toggle>
+
+        <div class="full-width col-md-4 mt-3">
+            <button mat-raised-button color="primary" type="submit" [disabled]="addDentalForm.invalid">
+                {{ ADD_OR_MODIFY_BUTTON | translate }}
+            </button>
+        </div>
+    </form>
+</div>

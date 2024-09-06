@@ -1,0 +1,53 @@
+<h1 mat-dialog-title appDisableRightClick>{{ isEdit ? ('EDIT_INSTALLMENT' | translate) : ('ADD_INSTALLMENT' | translate) }}</h1>
+<div mat-dialog-content appDisableRightClick>
+  <form [formGroup]="installmentForm">
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'PATIENT_NAME' | translate }}</mat-label>
+      <input matInput formControlName="patientName">
+      @if(installmentForm.get('patientName')?.hasError('required')) {
+        <mat-error>
+          {{ 'PATIENT_NAME_REQUIRED' | translate }}
+        </mat-error>
+      }
+
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'AMOUNT' | translate }}</mat-label>
+      <input matInput type="number" formControlName="amount">
+      @if(installmentForm.get('amount')?.hasError('required')){
+        <mat-error>
+          {{ 'AMOUNT_REQUIRED' | translate }}
+        </mat-error>
+      }
+      @if(installmentForm.get('amount')?.hasError('min')){
+        <mat-error>
+          {{ 'AMOUNT_MIN' | translate }}
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'DUE_DATE' | translate }}</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="dueDate">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      @if(installmentForm.get('dueDate')?.hasError('required')){
+        <mat-error>
+          {{ 'DUE_DATE_REQUIRED' | translate }}
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'DESCRIPTION' | translate }}</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions appDisableRightClick>
+  <button mat-button (click)="close()">{{ 'CANCEL' | translate }}</button>
+  <button mat-raised-button color="primary" (click)="save()" [disabled]="installmentForm.invalid">
+    {{ 'SAVE' | translate }}
+  </button>
+</div>

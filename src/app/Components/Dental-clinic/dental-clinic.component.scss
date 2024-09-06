@@ -1,0 +1,56 @@
+.dental-lest{
+    margin-top: 80px !important;
+}
+.full-width {
+    width: 100%;
+    margin-right: 10px !important;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: row;
+}
+.screen-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+mat-form-field.full-width {
+    flex: 1;
+}
+
+.input-group button {
+    display: inline-block;
+    /* margin-left: 10px !important; */
+    padding: 15px !important;
+    min-height: 55px;
+}
+
+
+
+
+// mat-paginator{
+//     background-color: #b93347 !important;
+//     color: white !important; 
+// }
+.mat-sort-header-container {
+    align-items: center;
+
+  }
+  .spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    /* Full viewport height */
+    width: 100vw;
+    /* Full viewport width */
+    position: fixed;
+    /* Fix the spinner at the center of the screen */
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    /* Optional: semi-transparent background */
+    z-index: 9999;
+    /* Ensure it is on top of other content */
+}

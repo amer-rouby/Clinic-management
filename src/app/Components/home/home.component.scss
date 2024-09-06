@@ -1,0 +1,33 @@
+.route-container {
+    margin-top: 100px;
+    display: flex;
+    gap: 20px;
+    justify-content: center; /* Centers the content */
+    flex-wrap: wrap; /* Allows the items to wrap to the next line on smaller screens */
+  }
+  
+  .route-item {
+    text-align: center; /* Centers the image and text */
+    text-decoration: none; /* Removes the underline from links */
+    color: inherit; /* Keeps the text color consistent */
+    width: 300px; /* Sets a fixed width for the items */
+    height: 300px; /* Sets a fixed width for the items */
+  }
+  
+  .route-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%; /* Makes the image circular */
+    object-fit: cover; /* Ensures the image covers the circular area */
+    margin-bottom: 8px; /* Adds some space between the image and the text */
+    transition: transform 0.3s; /* Adds a hover effect */
+  }
+  
+  .route-item:hover .route-image {
+    transform: scale(1.05); /* Slightly enlarges the image on hover */
+  }
+  
+  .route-title {
+    font-size: 14px; /* Sets the font size for the title */
+    font-weight: bold; /* Makes the title bold */
+  }

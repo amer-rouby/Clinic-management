@@ -1,0 +1,80 @@
+@if(loadingData){
+<div class="spinner-container">
+    <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
+</div>
+}
+
+<div class="container dental-lest" appDisableRightClick>
+    <h1 class="screen-title">{{"APPOINTMENTS_TODAY" | translate}}</h1>
+    <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <ng-container matColumnDef="checkbox">
+            <mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="selectAll($event)" [checked]="isAllSelected()"></mat-checkbox>
+                <button mat-icon-button (click)="loadDental()">
+                    <mat-icon>refresh</mat-icon>
+                </button>
+                <button mat-icon-button (click)="openDialog()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let newDental">
+                <mat-checkbox (click)="$event.stopPropagation()" [checked]="isSelected(newDental)"
+                    (change)="toggleSelection(newDental)">
+                </mat-checkbox>
+            </mat-cell>
+        </ng-container>
+        <!-- Title Column -->
+        <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef>
+                {{ 'TITLE' | translate }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let newDental">{{ newDental.title }}</mat-cell>
+        </ng-container>
+        <!-- Description Column -->
+        <ng-container matColumnDef="description">
+            <mat-header-cell *matHeaderCellDef>{{ 'DESCRIPTION' |
+                translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let newDental">{{ newDental.description }}</mat-cell>
+        </ng-container>
+        <!-- Phone Number Column -->
+        <ng-container matColumnDef="phoneNumber">
+            <mat-header-cell *matHeaderCellDef>{{ 'PHONE_NUMBER' |
+                translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let newDental">{{ newDental.phoneNumber }}</mat-cell>
+        </ng-container>
+        <!-- Date Column -->
+        <ng-container matColumnDef="date">
+            <mat-header-cell *matHeaderCellDef>{{ 'BOOKING_DATE' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let newDental" [appDateFormat]="'dd/MM/yyyy'" [dateValue]="newDental.date">
+              {{ newDental.date }}
+            </mat-cell>
+          </ng-container>
+          
+        <!-- Update Button Column -->
+        <ng-container matColumnDef="updateButton">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let newDental">
+                <button mat-mini-fab color="primary" [disabled]="!newDental.completed"
+                    (click)="editDentalClinicDialog(newDental)">
+                    <mat-icon>edit</mat-icon>
+                </button>
+            </mat-cell>
+        </ng-container>
+        
+        <!-- Delete Button Column -->
+        <ng-container matColumnDef="deleteButton">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let newDental">
+                <button mat-mini-fab color="warn" [disabled]="!newDental.completed"
+                    (click)="confirmDelete(newDental.id)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+    <mat-paginator [length]="dental.length" [pageSize]="itemsPerPage" [pageSizeOptions]="[5, 10, 15, 20]"
+        (page)="onPageChange($event)">
+    </mat-paginator>
+</div>

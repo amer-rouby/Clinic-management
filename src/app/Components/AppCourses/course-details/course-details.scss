@@ -1,0 +1,74 @@
+.card-details {
+    margin-top: 100px !important;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+}
+
+.course-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+
+    &:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-header {
+        color: #f8f9fa !important;
+        border-bottom: 1px solid #dee2e6;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .card-body {
+        background-color: #ffffff;
+        padding: 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+
+    .card-subtitle {
+        font-size: 1rem;
+        color: #6c757d;
+    }
+
+    .card-text {
+        margin-top: 0.5rem;
+        font-size: 1rem;
+        color: #495057;
+    }
+
+    .btn {
+        margin-top: 1rem;
+    }
+}
+
+.course-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    /* Full viewport height */
+    width: 100vw;
+    /* Full viewport width */
+    position: fixed;
+    /* Fix the spinner at the center of the screen */
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    /* Optional: semi-transparent background */
+    z-index: 9999;
+    /* Ensure it is on top of other content */
+}

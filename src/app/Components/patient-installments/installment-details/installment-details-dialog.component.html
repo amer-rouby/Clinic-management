@@ -1,0 +1,95 @@
+<div class="container-dealog" appDisableRightClick>
+  @if (isLoading ) {
+  <div class="spinner-container">
+    <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
+  </div>
+  }
+
+  <div class="dialog-header d-flex justify-content-between">
+    <button mat-icon-button (click)="onCloseClick()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+    <h1 mat-dialog-title>{{ 'INSTALLMENT_DETAILS' | translate }} / {{ data.patientName }}</h1>
+    <button mat-raised-button class="mx-4 my-4" [ngStyle]="{ 'background-color': getThemeColor(), 'color':'#fff'}"
+      (click)="toggleAddInstallment() "> {{ ADD_OR_CANCEL | translate
+      }}</button>
+  </div>
+
+  @if(showAddInstallment){
+  <form class="mx-4" [formGroup]="installmentForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'PAYMENT_DATE' | translate }}</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="dueDate" [matDatepickerFilter]="myFilter">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field class="mx-2" appearance="fill">
+      <mat-label>{{ 'AMOUNT' | translate }}</mat-label>
+      <input matInput formControlName="amount" type="number">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>{{ 'DESCRIPTION' | translate }}</mat-label>
+      <input matInput formControlName="description">
+    </mat-form-field>
+
+    <div mat-dialog-actions>
+      <button mat-button color="primary" type="submit" [disabled]="installmentForm.invalid || isLoading">
+        {{ ADD_OR_EDIT | translate }}
+      </button>
+    </div>
+  </form>
+
+  }
+  @if(!isLoading){
+  <div mat-dialog-content>
+    <mat-table [dataSource]="installments" class="mat-elevation-z8">
+      <!-- Date Column -->
+      <ng-container matColumnDef="dueDate">
+        <mat-header-cell *matHeaderCellDef>{{ 'PAYMENT_DATE' | translate }}</mat-header-cell>
+        <mat-cell *matCellDef="let installment" [appDateFormat]="'dd/MM/yyyy'" [dateValue]="installment.dueDate">
+          {{ installment.dueDate ? installment.dueDate : 'No Date' }}
+        </mat-cell>
+      </ng-container>
+      
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <mat-header-cell *matHeaderCellDef>{{ 'DESCRIPTION' | translate }}</mat-header-cell>
+        <mat-cell *matCellDef="let installment">
+          {{ installment.description }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Amount Column -->
+      <ng-container matColumnDef="amount">
+        <mat-header-cell *matHeaderCellDef>{{ 'AMOUNT' | translate }}</mat-header-cell>
+        <mat-cell *matCellDef="let installment">
+          {{ installment.amount | currency: 'EGY' }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef>{{ 'ACTIONS' | translate }}</mat-header-cell>
+        <mat-cell *matCellDef="let installment">
+          <button mat-icon-button color="primary" (click)="editInstallment(installment)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="confirmDelete(installment.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <!-- Header Row -->
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <!-- Data Rows -->
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+
+    <!-- Summary -->
+    <p>{{ 'TOTAL_PAID' | translate }}: {{ totalPaid | currency: 'EGY' }}</p>
+  </div>
+  }
+</div>

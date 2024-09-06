@@ -1,0 +1,45 @@
+<div class="container course-lest" appDisableRightClick>
+    <div class="row justify-content-center">
+        <div class="col-md-12 mt-3 mb-2 d-flex justify-content-between">
+            <div class="col-md-6 d-flex align-items-center">
+                <mat-form-field class="w-100">
+                    <mat-icon matPrefix>search</mat-icon>
+                    <input matInput placeholder="{{ 'SEARCH_BY_DESCRIPTION' | translate }}" [(ngModel)]="searchTerm"
+                        (input)="applyFilter(searchTerm)">
+                </mat-form-field>
+            </div>
+            <div class="add-course col-md-6 d-flex justify-content-end align-items-center">
+                <button  class="btn btn-sm" 
+                    [ngStyle]="{ 'background-color': getThemeColor() , 'color':'#fff'}" 
+                    (click)="openDialog()">
+                    <mat-icon>add_circle</mat-icon>{{ 'ADD_NEW_COURSE' | translate }}
+                </button>
+            </div>
+        </div>
+    </div>
+    @if(loadingData) {
+    <div class="spinner-container">
+        <mat-progress-spinner diameter="50" mode="indeterminate"></mat-progress-spinner>
+    </div>
+    }
+    <div class="row justify-content-center">
+        @for(course of pagedCourses; track course.id){
+        <ng-container>
+            <div class="col-md-6">
+                <app-course-card-component [pagedCourses]="pagedCourses" [course]="course"
+                    (loadCourses)="loadCourses()">
+                </app-course-card-component>
+            </div>
+        </ng-container>
+        }@empty {
+        <app-page-not-found />
+        }
+    </div>
+    @if(pagedCourses.length){
+    <div class="row justify-content-center">
+        <mat-paginator [pageSize]="pageSize" [pageSizeOptions]="[4, 6, 10]" [length]="filteredCourses.length"
+            (page)="onPageChange($event)">
+        </mat-paginator>
+    </div>
+    }
+</div>
