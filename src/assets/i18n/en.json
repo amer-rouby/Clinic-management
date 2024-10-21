@@ -105,5 +105,8 @@
     "COURSE_UPDATED_SUCCESS": "Course updated successfully!",
     "COURSE_ADDED_SUCCESS": "Course added successfully!",
      "COURSE_DELETED_SUCCESS": "Course deleted successfully!",
-    "CARD_SUBTITLE": "Card Subtitle"
+    "CARD_SUBTITLE": "Card Subtitle",
+    "ADD_DESCRIPTION": "Add Description ",
+    "ADD_TITLE": "Add patient name",
+    "ADD_PHONE_NUMBER": "Add phone number"
 }

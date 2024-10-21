@@ -120,6 +120,6 @@ export class PatientInstallmentsComponent implements OnInit, OnDestroy {
   }
   
   getThemeColor(): any {
-    return this.themeColor === 'primary' ? '#3f51b5' : '#e91e63';
+    return this.themeColor === 'primary' ? '#003366' : '#b03060';
   }
 }

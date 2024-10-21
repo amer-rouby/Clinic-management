@@ -189,6 +189,6 @@ export class InstallmentDetailsDialogComponent implements OnInit {
     return this.ADD_OR_EDIT === "EDIT_BUTTON";
   }
   getThemeColor(): any {
-    return this.themeColor === 'primary' ? '#3f51b5' : '#e91e63';
+    return this.themeColor === 'primary' ? '#003366' : '#b03060';
   }
 }
