@@ -2,16 +2,16 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatDialog } from '@angular/material/dialog';
+
 import { ConfirmDialogComponent } from '../../materail-ui/delete-confirm-dialog/confirm-dialog.component';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { DentalClinic } from '../../Models/DentalClinic.module';
 import { AddDentalClinicComponent } from './add-dental-clinic/add-dental-clinic.component';
 import { SharedMaterialModule } from '../../../Shared/modules/shared.material.module';
 import { DentalClinicService } from '../../Services/dental-clinic.service';
-import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
-
+import { DialogService } from '../../Services/dialog.service';
+import { ToastrService } from '../../Services/toastr.service';
+import { TranslateService } from '../../Services/translate.service';
 
 @Component({
   selector: 'app-dental-clinic',
@@ -23,134 +23,113 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class DentalClinicComponent implements OnInit {
   dentalClinicForm: FormGroup;
-  dental: DentalClinic[] = [];
-  newDental: DentalClinic = this.createEmptyDenta();
-  currentPage: number = 0;
-  itemsPerPage: number = 9;
-  selectedDentalClinic: DentalClinic[] = [];
-  loadingData: boolean = false;
-  dataSource = new MatTableDataSource<DentalClinic>(this.dental);
-  displayedColumns: string[] = [
-    'checkbox', 'title', 'description',
-    'phoneNumber', 'date', 'updateButton',
-    'deleteButton'
-  ];
+  dentalClinics: DentalClinic[] = [];
+  selectedDentalClinics: DentalClinic[] = [];
+  loadingData = false;
+  currentPage = 0;
+  itemsPerPage = 9;
 
+  dataSource = new MatTableDataSource<DentalClinic>(this.dentalClinics);
+  displayedColumns = ['checkbox', 'title', 'description', 'phoneNumber', 'date', 'updateButton', 'deleteButton'];
 
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
 
   constructor(
-    private fb: FormBuilder, 
-    private dialog: MatDialog,
+    private fb: FormBuilder,
+    private dialogService: DialogService,
     private dentalClinicService: DentalClinicService,
     private toastr: ToastrService,
     private translate: TranslateService
   ) {
-    this.dentalClinicForm = this.fb.group({
-      title: ['', Validators.required],
-      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
-      description: ['', Validators.required],
-      date: ['', Validators.required],
-    });
+    this.dentalClinicForm = this.createDentalClinicForm();
   }
 
   ngOnInit() {
-    this.loadDental();
+    this.loadDentalClinics();
     this.dataSource.paginator = this.paginator;
-
   }
 
-  createEmptyDenta(): DentalClinic {
-    return { id: '', title: '', date: new Date(), completed: false, phoneNumber: '', description: '' };
+  private createDentalClinicForm(): FormGroup {
+    return this.fb.group({
+      title: ['', Validators.required],
+      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      description: ['', Validators.required],
+      date: ['', Validators.required]
+    });
   }
 
-  loadDental() {
+  loadDentalClinics(): void {
     this.loadingData = true;
     this.dentalClinicService.getAllDentalClinic().subscribe(dental => {
-      this.dental = dental.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      this.dataSource.data = this.dental;
+      this.dentalClinics = dental.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      this.dataSource.data = this.dentalClinics;
       this.loadingData = false;
     });
   }
 
-  openDialog(): void {
-    const dialogRef = this.dialog.open(AddDentalClinicComponent, {
-      width: '600px',
-      height: "450px"
-    });
-
-    dialogRef.componentInstance.dentalClinicAdded.subscribe(() => this.loadDental());
+  openAddDentalClinicDialog(): void {
+    const emptyDentalClinic = this.createEmptyDentalClinic();
+    this.dialogService.openDialog(AddDentalClinicComponent, emptyDentalClinic).subscribe(() => this.loadDentalClinics());
   }
 
-  editDentalClinicDialog(dentalClinic: DentalClinic) {
-    const dialogRef = this.dialog.open(AddDentalClinicComponent, {
-      width: '600px',
-      height: '450px',
-      data: { dental: dentalClinic }
-    });
-  
-    dialogRef.componentInstance.dentalClinicAdded.subscribe(() => this.loadDental());
+  openEditDentalClinicDialog(dentalClinic: DentalClinic): void {
+    this.dialogService.openDialog(AddDentalClinicComponent, { dental: dentalClinic }).subscribe(() => this.loadDentalClinics());
   }
-  
 
-  confirmDelete(dentalId: string) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent);
-    dialogRef.afterClosed().subscribe(result => {
+  confirmDelete(dentalId: string): void {
+    this.dialogService.openDialog(ConfirmDialogComponent).subscribe(result => {
       if (result) {
-        this.deleteDenta(dentalId);
+        this.deleteDentalClinic(dentalId);
       }
     });
   }
 
-  deleteDenta(dentalId: string) {
+  private deleteDentalClinic(dentalId: string): void {
     this.loadingData = true;
     this.dentalClinicService.deleteDentalClinic(dentalId).subscribe(() => {
       this.loadingData = false;
-      this.loadDental();
+      this.loadDentalClinics();
       this.toastr.success(this.translate.instant('DENTAL_CLINIC_DELETED_SUCCESS'));
-
     });
   }
 
   isAllSelected(): boolean {
-    const numSelected = this.selectedDentalClinic.length;
-    const numRows = this.paginatedDentalClinic.length;
-    return numSelected === numRows;
+    return this.selectedDentalClinics.length === this.paginatedDentalClinics.length;
   }
 
-  selectAll(event: any) {
+  selectAll(event: any): void {
     if (event.checked) {
-      this.selectedDentalClinic= [...this.paginatedDentalClinic];
-      this.paginatedDentalClinic.forEach(dentalClinic => dentalClinic.completed = true);
+      this.selectedDentalClinics = [...this.paginatedDentalClinics];
+      this.paginatedDentalClinics.forEach(dentalClinic => dentalClinic.completed = true);
     } else {
-      this.selectedDentalClinic= [];
-      this.paginatedDentalClinic.forEach(dentalClinic => dentalClinic.completed = false);
+      this.selectedDentalClinics = [];
+      this.paginatedDentalClinics.forEach(dentalClinic => dentalClinic.completed = false);
     }
   }
 
-  toggleSelection(dental: DentalClinic) {
+  toggleSelection(dental: DentalClinic): void {
     dental.completed = !dental.completed;
-    if (dental.completed) {
-      this.selectedDentalClinic.push(dental);
-    } else {
-      this.selectedDentalClinic = this.selectedDentalClinic.filter(t => t.id !== dental.id);
-    }
+    this.selectedDentalClinics = dental.completed
+      ? [...this.selectedDentalClinics, dental]
+      : this.selectedDentalClinics.filter(t => t.id !== dental.id);
   }
 
   isSelected(dental: DentalClinic): boolean {
     return dental.completed;
   }
 
-  onPageChange(event: any) {
+  onPageChange(event: any): void {
     this.currentPage = event.pageIndex;
     this.itemsPerPage = event.pageSize;
   }
 
-  get paginatedDentalClinic(): DentalClinic[] {
+  private get paginatedDentalClinics(): DentalClinic[] {
     const startIndex = this.currentPage * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-    return this.dental.slice(startIndex, endIndex);
+    return this.dentalClinics.slice(startIndex, endIndex);
   }
 
-
+  private createEmptyDentalClinic(): DentalClinic {
+    return { id: '', title: '', date: new Date(), completed: false, phoneNumber: '', description: '' };
+  }
 }

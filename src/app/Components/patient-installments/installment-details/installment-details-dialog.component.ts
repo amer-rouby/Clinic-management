@@ -8,8 +8,8 @@ import { ConfirmDialogComponent } from '../../../materail-ui/delete-confirm-dial
 import { noFutureDateValidator } from '../../../../Shared/Date-Validator/FutureDateValidator';
 import { ThemeService } from '../../../Services/theme.service';
 import { Subscription } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
+import { ToastrService } from '../../../Services/toastr.service';
+import { TranslateService } from '../../../Services/translate.service';
 
 @Component({
   selector: 'app-installment-details-dialog',
@@ -27,12 +27,16 @@ export class InstallmentDetailsDialogComponent implements OnInit {
   totalAmount: number;
   displayedColumns: string[] = ['dueDate', 'description', 'amount', 'actions'];
   isEditMode = false;
-  showAddInstallment: boolean = false;
+  showAddInstallment = false;
   themeColor: string = 'primary';
   currentInstallmentId: string | null = null;
+  
+  // Constants for button labels
   ADD_OR_EDIT = "ADD_BUTTON";
   ADD_OR_CANCEL = 'ADD_INSTALLMENT';
-  themeSubscription!: Subscription;
+
+  private themeSubscription!: Subscription;
+
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<InstallmentDetailsDialogComponent>,
@@ -53,13 +57,19 @@ export class InstallmentDetailsDialogComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.themeSubscription = this.themeService.themeColor$.subscribe(color => {
       this.themeColor = color;
     });
   }
 
-  loadInstallments(patientName: string) {
+  ngOnDestroy(): void {
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
+  }
+
+  loadInstallments(patientName: string): void {
     this.isLoading = true;
     this.addInstallmentService.getInstallmentsByPatient(patientName).subscribe({
       next: (installments) => {
@@ -74,76 +84,76 @@ export class InstallmentDetailsDialogComponent implements OnInit {
     });
   }
 
-  calculateTotals() {
+  calculateTotals(): void {
     this.totalPaid = this.installments.reduce((total, installment) => total + (installment.amount || 0), 0);
     this.remainingAmount = this.totalAmount - this.totalPaid;
   }
 
-  toggleAddInstallment() {
-
-    if (this.showAddInstallment == false) {
-      this.showAddInstallment = true;
-      this.ADD_OR_CANCEL = "CANCEL"
-    } else {
-      this.showAddInstallment = false;
-      this.ADD_OR_CANCEL = "ADD_INSTALLMENT"
-      this.ADD_OR_EDIT = "ADD_BUTTON";
-      this.installmentForm.reset();
-    }
+  toggleAddInstallment(): void {
+    this.showAddInstallment = !this.showAddInstallment;
+    this.ADD_OR_CANCEL = this.showAddInstallment ? 'CANCEL' : 'ADD_INSTALLMENT';
+    this.isEditMode = false; // Reset edit mode when toggling
+    this.installmentForm.reset();
   }
-  onSubmit() {
+
+  onSubmit(): void {
     if (this.installmentForm.valid) {
       this.isLoading = true;
 
-      const newInstallment: any = {
-        dueDate: this.installmentForm.value.dueDate,
-        amount: this.installmentForm.value.amount,
-        description: this.installmentForm.value.description,
-        patientName: this.data.patientName
-      };
+      const newInstallment = this.getInstallmentFromForm();
 
       if (this.isEditMode && this.currentInstallmentId) {
-        this.addInstallmentService.updateInstallment(this.currentInstallmentId, newInstallment).subscribe({
-          next: () => {
-            this.installmentForm.reset();
-            this.isEditMode = false;
-            this.currentInstallmentId = null;
-            this.showAddInstallment = false;
-            this.ADD_OR_CANCEL = 'ADD_INSTALLMENT';
-            this.ADD_OR_EDIT = "ADD_BUTTON";
-            this.loadInstallments(this.data.patientName);
-            this.isLoading = false;
-            this.toastr.success(this.translate.instant('INSTALLMENT_UPDATED_SUCCESS'));
-          },
-          error: (error) => {
-            console.error('Error updating installment', error);
-            this.isLoading = false;
-          }
-        });
+        this.updateInstallment(newInstallment);
       } else {
-        this.addInstallmentService.addInstallment(newInstallment).subscribe({
-          next: (addedInstallment: Installment) => {
-            this.installmentForm.reset();
-            this.loadInstallments(this.data.patientName);
-            this.isLoading = false;
-            this.showAddInstallment = false;
-            this.ADD_OR_CANCEL = 'ADD_INSTALLMENT';
-            this.toastr.success(this.translate.instant('INSTALLMENT_ADDED_SUCCESS'));
-          },
-          error: (error) => {
-            console.error('Error adding installment', error);
-            this.isLoading = false;
-          }
-        });
+        this.addInstallment(newInstallment);
       }
     }
   }
 
-  editInstallment(installment: any) {
+  getInstallmentFromForm(): any {
+    return {
+      dueDate: this.installmentForm.value.dueDate,
+      amount: this.installmentForm.value.amount,
+      description: this.installmentForm.value.description,
+      patientName: this.data.patientName
+    };
+  }
+
+  private addInstallment(newInstallment: any): void {
+    this.addInstallmentService.addInstallment(newInstallment).subscribe({
+      next: () => this.handleInstallmentSuccess(),
+      error: (error) => this.handleInstallmentError(error)
+    });
+  }
+
+  private updateInstallment(newInstallment: any): void {
+    this.addInstallmentService.updateInstallment(this.currentInstallmentId!, newInstallment).subscribe({
+      next: () => this.handleInstallmentSuccess(),
+      error: (error) => this.handleInstallmentError(error)
+    });
+  }
+
+  private handleInstallmentSuccess(): void {
+    this.installmentForm.reset();
+    this.loadInstallments(this.data.patientName);
+    this.isLoading = false;
+    this.showAddInstallment = false;
+    this.ADD_OR_CANCEL = 'ADD_INSTALLMENT';
+    this.toastr.success(this.translate.instant(this.isEditMode ? 'INSTALLMENT_UPDATED_SUCCESS' : 'INSTALLMENT_ADDED_SUCCESS'));
+    this.isEditMode = false;
+    this.currentInstallmentId = null;
+  }
+
+  private handleInstallmentError(error: any): void {
+    console.error('Error adding/updating installment', error);
+    this.isLoading = false;
+  }
+
+  editInstallment(installment: any): void {
     this.isEditMode = true;
     this.showAddInstallment = true;
-    this.ADD_OR_CANCEL = 'CANCEL';
-    this.ADD_OR_EDIT = "EDIT_BUTTON";
+    this.ADD_OR_CANCEL = 'ADD_INSTALLMENT';
+    this.ADD_OR_EDIT = "ADD_BUTTON";
     this.currentInstallmentId = installment.id;
     this.installmentForm.patchValue({
       dueDate: installment.dueDate,
@@ -152,7 +162,7 @@ export class InstallmentDetailsDialogComponent implements OnInit {
     });
   }
 
-  confirmDelete(id: string) {
+  confirmDelete(id: string): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '500px',
       data: { message: 'هل انت متاكد من حذف هذا القسط؟' }
@@ -165,14 +175,14 @@ export class InstallmentDetailsDialogComponent implements OnInit {
     });
   }
 
-  deleteInstallment(id: string) {
+  deleteInstallment(id: string): void {
     this.isLoading = true;
     this.addInstallmentService.deleteInstallment(id).subscribe({
       next: () => this.loadInstallments(this.data.patientName),
-      error: (error) => console.error('Error deleting installment', error),
+      error: (error) => this.handleInstallmentError(error),
       complete: () => this.isLoading = false
     });
-    this.toastr.success(this.translate.instant('INSTALLMENT_DELETED_SUCCESS')); 
+    this.toastr.success(this.translate.instant('INSTALLMENT_DELETED_SUCCESS'));
   }
 
   onCloseClick(): void {
@@ -185,10 +195,11 @@ export class InstallmentDetailsDialogComponent implements OnInit {
     return date ? date >= today : false;
   };
 
-  isEditModeButton() {
-    return this.ADD_OR_EDIT === "EDIT_BUTTON";
+  isEditModeButton(): boolean {
+    return this.ADD_OR_EDIT === 'EDIT_BUTTON';
   }
-  getThemeColor(): any {
+
+  getThemeColor(): string {
     return this.themeColor === 'primary' ? '#003366' : '#b03060';
   }
 }

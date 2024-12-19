@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -9,8 +8,9 @@ import { AddEditInstallmentDialogComponent } from './add-patient-installments/ad
 import { ConfirmDialogComponent } from '../../materail-ui/delete-confirm-dialog/confirm-dialog.component';
 import { ThemeService } from '../../Services/theme.service';
 import { InstallmentDetailsDialogComponent } from './installment-details/installment-details-dialog.component';
-import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
+import { ToastrService } from '../../Services/toastr.service';
+import { TranslateService } from '../../Services/translate.service';
+import { DialogService } from '../../Services/dialog.service';
 
 @Component({
   selector: 'app-patient-installments',
@@ -21,18 +21,18 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class PatientInstallmentsComponent implements OnInit, OnDestroy {
   installments: any[] = [];
-  displayedColumns: string[] = ['index','patientName', 'amount', 'dueDate', 'description', 'actions', 'details'];
-  dataSource = new MatTableDataSource<any>([]); // Update dataSource
+  displayedColumns: string[] = ['index', 'patientName', 'amount', 'dueDate', 'description', 'actions', 'details'];
+  dataSource = new MatTableDataSource<any>([]); // Data source
   isLoading = false;
-  searchTerm: string = '';
-  themeColor: string = 'primary';
-  themeSubscription!: Subscription;
+  searchTerm = '';
+  themeColor = 'primary';
+  private themeSubscription!: Subscription;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private patientInstallmentService: PatientInstallmentService,
-    private dialog: MatDialog,
+    private dialogService: DialogService,
     public themeService: ThemeService,
     private toastr: ToastrService,
     private translate: TranslateService
@@ -40,86 +40,85 @@ export class PatientInstallmentsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadInstallments();
+    this.subscribeToThemeChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.themeSubscription?.unsubscribe();
+  }
+
+  private subscribeToThemeChanges(): void {
     this.themeSubscription = this.themeService.themeColor$.subscribe(color => {
       this.themeColor = color;
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.themeSubscription) {
-      this.themeSubscription.unsubscribe();
-    }
-  }
-
-  loadInstallments() {
+  private loadInstallments(): void {
     this.isLoading = true;
     this.patientInstallmentService.getAllInstallments().subscribe({
       next: (data) => {
-        this.installments = data.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
-        this.dataSource.data = this.installments; // Set dataSource data
-        this.dataSource.paginator = this.paginator; // Set paginator
-        this.isLoading = false;
+        this.installments = this.sortInstallmentsByDueDate(data);
+        this.updateDataSource();
       },
-      error: (error) => {
-        console.error(error);
-        this.isLoading = false;
-      }
+      error: (error) => this.handleError(error)
     });
   }
-  
 
-  applyFilter() {
-    this.isLoading = true;
-    const searchTermLower = this.searchTerm.toLowerCase();
-    this.dataSource.filter = searchTermLower; // Use built-in filter method
+  private sortInstallmentsByDueDate(data: any[]): any[] {
+    return data.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+  }
+
+  private updateDataSource(): void {
+    this.dataSource.data = this.installments;
+    this.dataSource.paginator = this.paginator;
     this.isLoading = false;
   }
 
-  openAddEditDialog(installment?: any) {
-    const dialogRef = this.dialog.open(AddEditInstallmentDialogComponent, {
-      data: { installment },
-    });
+  private handleError(error: any): void {
+    console.error(error);
+    this.isLoading = false;
+  }
 
-    dialogRef.afterClosed().subscribe(result => {
+  applyFilter(): void {
+    this.isLoading = true;
+    this.dataSource.filter = this.searchTerm.toLowerCase();
+    this.isLoading = false;
+  }
+
+  openAddEditDialog(installment?: any): void {
+    this.dialogService.openDialog(AddEditInstallmentDialogComponent, { installment }).subscribe(result => {
       if (result) {
         this.loadInstallments();
       }
     });
   }
 
-  confirmDelete(id: string) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '350px',
-      data: { message: 'Are you sure you want to delete this installment?' }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
+  confirmDelete(id: string): void {
+    this.dialogService.openDialog(ConfirmDialogComponent).subscribe(result => {
       if (result) {
         this.deleteInstallment(id);
       }
     });
   }
 
-  deleteInstallment(id: string) {
+  private deleteInstallment(id: string): void {
     this.isLoading = true;
     this.patientInstallmentService.deleteInstallment(id).subscribe({
-      next: () => this.loadInstallments(),
-      error: (error) => console.error('Error deleting installment', error),
+      next: () => {
+        this.loadInstallments();
+        this.toastr.success(this.translate.instant('INSTALLMENT_DELETED_SUCCESS'));
+      },
+      error: (error) => this.handleError(error)
     });
-    this.toastr.success(this.translate.instant('INSTALLMENT_DELETED_SUCCESS')); 
-    this.isLoading = false;
   }
 
-  viewInstallmentDetails(element: any) {
-    this.dialog.open(InstallmentDetailsDialogComponent, {
-      data: { patientName: element.patientName, installments: this.installments.filter(i => i.patientName === element.patientName) },
-      width: '100vw ',
-      height: '100vh',
-      panelClass: 'full-screen-dialog'  // استخدام اسم الفئة لأسلوب CSS
-    });
+  viewInstallmentDetails(element: any): void {
+    const patientInstallments = this.installments.filter(i => i.patientName === element.patientName);
+    this.dialogService.openDialog(InstallmentDetailsDialogComponent, 
+      { patientName: element.patientName, installments: patientInstallments }, '80vw');
   }
-  
-  getThemeColor(): any {
+
+  getThemeColor(): string {
     return this.themeColor === 'primary' ? '#003366' : '#b03060';
   }
 }

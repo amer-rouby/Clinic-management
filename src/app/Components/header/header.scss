@@ -129,6 +129,7 @@ button {
   cursor: pointer;
   color: inherit;
   padding: 10px;
+  color: #fff !important;
 }
 
 .spacer {
@@ -138,4 +139,8 @@ button {
 .active-link {
   font-weight: bold !important;
   color: rgb(221, 221, 226) !important;
+}
+
+.btn-in{
+  color:#000 !important
 }

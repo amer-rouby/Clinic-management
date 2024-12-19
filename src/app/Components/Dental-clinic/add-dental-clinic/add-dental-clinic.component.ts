@@ -6,23 +6,23 @@ import { DentalClinic } from '../../../Models/DentalClinic.module';
 import { noFutureDateValidator } from '../../../../Shared/Date-Validator/FutureDateValidator';
 import { SharedMaterialModule } from '../../../../Shared/modules/shared.material.module';
 import { DentalClinicService } from '../../../Services/dental-clinic.service';
-import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
+import { ToastrService } from '../../../Services/toastr.service';
+import { TranslateService } from '../../../Services/translate.service';
 
 @Component({
   selector: 'app-add-dental-clinic',
-  standalone:true,
+  standalone: true,
   imports: [SharedMaterialModule],
   templateUrl: './add-dental-clinic.component.html',
   styleUrls: ['./add-dental-clinic.component.scss']
 })
 export class AddDentalClinicComponent implements OnInit {
   addDentalForm: FormGroup;
-  loadingData: boolean = false;
+  loadingData = false;
   @Output() dentalClinicAdded = new EventEmitter<DentalClinic>();
-  isEdit: boolean = false;
+  isEdit = false;
   dental: DentalClinic | null = null;
-  ADD_OR_MODIFY_BUTTON = "ADD_BUTTON";
+  ADD_OR_MODIFY_BUTTON = 'ADD_BUTTON';
 
   constructor(
     public dialogRef: MatDialogRef<AddDentalClinicComponent>,
@@ -45,58 +45,62 @@ export class AddDentalClinicComponent implements OnInit {
       completed: [false] // Initialize completed field
     });
 
-    if (data && data.dental) {
+    if (data?.dental) {
       this.isEdit = true;
       this.dental = data.dental;
-      this.ADD_OR_MODIFY_BUTTON = 'EDIT_BUTTON'
+      this.ADD_OR_MODIFY_BUTTON = 'EDIT_BUTTON';
     }
   }
 
   ngOnInit() {
     if (this.dental) {
-      this.addDentalForm.patchValue({
-        title: this.dental.title,
-        phoneNumber: this.dental.phoneNumber,
-        description: this.dental.description,
-        date: this.dental.date,
-        completed: this.dental.completed,
-      });
+      this.addDentalForm.patchValue(this.dental);
     }
   }
 
   addDentalClinic() {
     this.loadingData = true;
-
     if (this.addDentalForm.valid) {
+      const dentalClinicData = this.addDentalForm.value;
       if (this.isEdit && this.dental) {
-        const updatedDental: DentalClinic = { ...this.dental, ...this.addDentalForm.value };
-        this.dentalClinicService.updateDentalClinic(this.dental.id, updatedDental).subscribe({
-          next: (response: any) => {
-            this.dentalClinicAdded.emit(response);
-            this.onClose();
-            this.loadingData = false;
-            this.toastr.success(this.translate.instant('DENTAL_CLINIC_UPDATED_SUCCESS'));
-          },
-          error: (error) => {
-            console.error(error);
-            this.loadingData = false;
-          },
-        });
+        const updatedDental: DentalClinic = { ...this.dental, ...dentalClinicData };
+        this.updateDentalClinic(updatedDental);
       } else {
-        this.dentalClinicService.addDentalClinic(this.addDentalForm.value).subscribe({
-          next: (response) => {
-            this.dentalClinicAdded.emit(response);
-            this.onClose();
-            this.loadingData = false;
-            this.toastr.success(this.translate.instant('DENTAL_CLINIC_ADDED_SUCCESS'));
-          },
-          error: (error) => {
-            console.error(error);
-            this.loadingData = false;
-          },
-        });
+        this.createDentalClinic(dentalClinicData);
       }
+    } else {
+      this.loadingData = false;
     }
+  }
+
+  private updateDentalClinic(updatedDental: DentalClinic) {
+    this.dentalClinicService.updateDentalClinic(this.dental!.id, updatedDental).subscribe({
+      next: (response: any) => {
+        this.handleSuccess(response, 'DENTAL_CLINIC_UPDATED_SUCCESS');
+      },
+      error: (error) => this.handleError(error),
+    });
+  }
+
+  private createDentalClinic(dentalClinicData: any) {
+    this.dentalClinicService.addDentalClinic(dentalClinicData).subscribe({
+      next: (response) => {
+        this.handleSuccess(response, 'DENTAL_CLINIC_ADDED_SUCCESS');
+      },
+      error: (error) => this.handleError(error),
+    });
+  }
+
+  private handleSuccess(response: any, successMessage: string) {
+    this.dentalClinicAdded.emit(response);
+    this.onClose();
+    this.loadingData = false;
+    this.toastr.success(this.translate.instant(successMessage));
+  }
+
+  private handleError(error: any) {
+    console.error(error);
+    this.loadingData = false;
   }
 
   onClose(): void {
