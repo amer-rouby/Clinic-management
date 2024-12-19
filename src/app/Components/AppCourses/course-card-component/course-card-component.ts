@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../materail-ui/delete-confirm-dialog/confirm-dialog.component';
 import { CourseService } from '../../../Services/course.service';
-import { CategoryType } from '../../../Enums/category';
 import { AddCourseComponent } from '../add-course/add-course.component'; // Import the AddCourseComponent if not imported already
 import { SharedMaterialModule } from '../../../../Shared/modules/shared.material.module';
 import { ToastrService } from 'ngx-toastr';
@@ -25,7 +24,6 @@ export class CourseCardComponent {
     @Input() index!: number;
     @Input() count!: number;
     @Output() loadCourses = new EventEmitter<any>();
-    categoryType = CategoryType;
 
     constructor(public dialog: MatDialog, private router: Router,
         private courseService: CourseService,

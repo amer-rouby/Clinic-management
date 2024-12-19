@@ -7,6 +7,28 @@ import { SharedMaterialModule } from '../../../../Shared/modules/shared.material
 import { ToastrService } from 'ngx-toastr';
 import { TranslateService } from '@ngx-translate/core';
 
+export const CategoryTypeData = [
+  {
+    id:1,
+    arabic: "مبتدئين",
+    english: "Beginners"
+  },
+  {
+    id:2,
+    arabic: "متوسط",
+    english: "Intermediate"
+  },
+  {
+    id:3,
+    arabic: "متقدم",
+    english: "Advanced"
+  },
+  {
+    id:4,
+    arabic: "أخرى",
+    english: "Other"
+  }
+];
 
 @Component({
   selector: 'app-add-course',
@@ -21,7 +43,7 @@ export class AddCourseComponent implements OnInit {
   addCourseForm!: FormGroup;
   courseData: Course;
   ADD_OR_MODIFY_BUTTON = "ADD_BUTTON";
-
+  categorys = CategoryTypeData;
   @Output() courseAdded = new EventEmitter<Course>();
 
   constructor(
