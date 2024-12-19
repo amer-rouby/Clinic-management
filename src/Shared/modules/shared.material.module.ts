@@ -25,6 +25,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DateFormatDirective } from '../Directives/date-format.directive';
 import { DisableRightClickDirective } from '../Directives/disable-right-click.directive';
 import { TruncatePipe } from '../../app/pipes/truncate.pipe';
+import { TranslateTextPipe } from '../../app/pipes/Transform .pipe';
 
 const modules = [
   CommonModule,
@@ -55,8 +56,8 @@ const modules = [
 
 @NgModule({
   imports: modules,
-  declarations: [DateFormatDirective, DisableRightClickDirective,TruncatePipe], // Declare the directive here
-  exports: [...modules, DateFormatDirective, DisableRightClickDirective, TruncatePipe] // Export the directive if needed
+  declarations: [DateFormatDirective, DisableRightClickDirective,TruncatePipe, TranslateTextPipe], // Declare the directive here
+  exports: [...modules, DateFormatDirective, DisableRightClickDirective, TruncatePipe, TranslateTextPipe] // Export the directive if needed
 })
 export class SharedMaterialModule {}
 

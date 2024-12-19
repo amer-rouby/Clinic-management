@@ -25,7 +25,7 @@ export function translateCompilerFactory(): TranslateMessageFormatCompiler {
         useFactory: translateCompilerFactory
       }
     })
-  ],
+  ], 
   exports: [TranslateModule]
 })
 export class AppTranslateModule {
