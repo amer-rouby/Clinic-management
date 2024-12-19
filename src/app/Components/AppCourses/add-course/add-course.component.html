@@ -1,85 +1,98 @@
 <div class="add-course-form" appDisableRightClick>
-    <div class="dialog-header d-flex justify-content-end">
-        <h2 class="m-auto header">{{ ADD_OR_MODIFY_BUTTON | translate | uppercase }} COURSE</h2>
-        <button class="close-button" mat-icon-button (click)="onClose()">
-            <mat-icon>close</mat-icon>
-        </button>
+  <div class="dialog-header d-flex justify-content-end">
+    <h2 class="m-auto header">{{ ADD_OR_MODIFY_BUTTON | translate | uppercase }} COURSE</h2>
+    <button class="close-button" mat-icon-button (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <form [formGroup]="addCourseForm" class="p-2" (ngSubmit)="submitForm()">
+    <div class="form-row d-flex flex-wrap">
+      <mat-form-field appearance="fill" class="form-field col-md-12">
+        <mat-label>{{ 'FIRST_NAME' | translate }}</mat-label>
+        <input matInput formControlName="firstName" required>
+        @if(addCourseForm.get('firstName')?.hasError('required')){
+          <mat-error>{{ 'FIRST_NAME_REQUIRED' | translate }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="form-field col-md-12">
+        <mat-label>{{ 'LAST_NAME' | translate }}</mat-label>
+        <input matInput formControlName="lastName" required>
+        @if(addCourseForm.get('lastName')?.hasError('required')){
+          <mat-error>{{ 'LAST_NAME_REQUIRED' | translate }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="form-field col-md-12">
+        <mat-label>{{ 'DESCRIPTION' | translate }}</mat-label>
+        <input matInput formControlName="description" required>
+        @if(addCourseForm.get('description')?.hasError('required')){
+          <mat-error>{{ 'DESCRIPTION_REQUIRED' | translate }}</mat-error>
+        }
+      </mat-form-field>
     </div>
-    <form [formGroup]="addCourseForm" class="p-2" (ngSubmit)="addCourse()">
-        <div class="form-row d-flex flex-wrap">
-            <mat-form-field appearance="fill" class="form-field col-md-12">
-                <mat-label>{{ 'FIRST_NAME' | translate }}</mat-label>
-                <input matInput formControlName="firstName" required>
-                @if(addCourseForm.get('firstName')?.hasError('required')){
-                    <mat-error>{{ 'FIRST_NAME_REQUIRED' | translate }}</mat-error>
-                }
-            </mat-form-field>
 
-            <mat-form-field appearance="fill" class="form-field col-md-12">
-                <mat-label>{{ 'LAST_NAME' | translate }}</mat-label>
-                <input matInput formControlName="lastName" required>
-                @if(addCourseForm.get('lastName')?.hasError('required')){
-                    <mat-error>{{ 'LAST_NAME_REQUIRED' | translate }}</mat-error>
-                }
-            </mat-form-field>
+    <div class="form-row d-flex flex-wrap">
+      <mat-form-field appearance="fill" class="form-field col-md-12">
+        <mat-label>{{ 'COURSE_PRICE' | translate }}</mat-label>
+        <input matInput type="number" formControlName="coursePrice" required>
+        @if(addCourseForm.get('coursePrice')?.hasError('required')){
+          <mat-error>{{ 'COURSE_PRICE_REQUIRED' | translate }}</mat-error>
+        }
+        @if(addCourseForm.get('coursePrice')?.hasError('min')){
+          <mat-error>{{ 'COURSE_PRICE_MIN' | translate }}</mat-error>
+        }
+      </mat-form-field>
 
-            <mat-form-field appearance="fill" class="form-field col-md-12">
-                <mat-label>{{ 'DESCRIPTION' | translate }}</mat-label>
-                <input matInput formControlName="description" required>
-                @if(addCourseForm.get('description')?.hasError('required')){
-                    <mat-error>{{ 'DESCRIPTION_REQUIRED' | translate }}</mat-error>
-                }
-            </mat-form-field>
-        </div>
+      <mat-form-field appearance="fill" class="form-field col-md-12">
+        <mat-label>{{ 'EXPERIENCE_IN_THE_FIELD' | translate }}</mat-label>
+        <input matInput type="number" formControlName="experienceInTheField" required>
+        @if(addCourseForm.get('experienceInTheField')?.hasError('required')){
+          <mat-error>{{ 'EXPERIENCE_IN_THE_FIELD_REQUIRED' | translate }}</mat-error>
+        }
+        @if(addCourseForm.get('experienceInTheField')?.hasError('min')){
+          <mat-error>{{ 'EXPERIENCE_IN_THE_FIELD_MIN' | translate }}</mat-error>
+        }
+      </mat-form-field>
 
-        <div class="form-row d-flex flex-wrap">
-            <mat-form-field appearance="fill" class="form-field col-md-12">
-                <mat-label>{{ 'COURSE_PRICE' | translate }}</mat-label>
-                <input matInput type="number" formControlName="coursePrice" required>
-                @if(addCourseForm.get('coursePrice')?.hasError('required')){
-                    <mat-error>{{ 'COURSE_PRICE_REQUIRED' | translate }}</mat-error>
-                }
-                @if(addCourseForm.get('coursePrice')?.hasError('min')){
-                    <mat-error>{{ 'COURSE_PRICE_MIN' | translate }}</mat-error>
-                }
-            </mat-form-field>
+      <mat-form-field appearance="fill" class="form-field col-md-12">
+        <mat-label>{{ 'CATEGORY' | translate }}</mat-label>
+        <mat-select formControlName="category" required>
+          @for (category of categoryList; track category) {
+            <mat-option [value]="category.id">
+              {{ category | translateText }}
+            </mat-option>
+          }
+        </mat-select>
 
-            <mat-form-field appearance="fill" class="form-field col-md-12">
-                <mat-label>{{ 'EXPERIENCE_IN_THE_FIELD' | translate }}</mat-label>
-                <input matInput type="number" formControlName="experienceInTheField" required>
-                @if(addCourseForm.get('experienceInTheField')?.hasError('required')){
-                    <mat-error>{{ 'EXPERIENCE_IN_THE_FIELD_REQUIRED' | translate }}</mat-error>
-                }
-               @if(addCourseForm.get('experienceInTheField')?.hasError('min')){
-                <mat-error>{{ 'EXPERIENCE_IN_THE_FIELD_MIN' | translate }}</mat-error>
-               }
-            </mat-form-field>
+        <!-- عرض الأخطاء إن وجدت -->
+        @if (addCourseForm.get('category')?.hasError('required')) {
+          <mat-error>
+            {{ 'CATEGORY_REQUIRED' | translate }}
+          </mat-error>
+        }
+        @if (addCourseForm.get('category')?.hasError('min')) {
+          <mat-error>
+            {{ 'CATEGORY_POSITIVE' | translate }}
+          </mat-error>
+        }
+      </mat-form-field>
 
-            <mat-form-field appearance="fill" class="form-field col-md-12">
-                <mat-label>{{ 'CATEGORY' | translate }}</mat-label>
-                <input matInput type="number" formControlName="category" required>
-               @if(addCourseForm.get('category')?.hasError('required')){
-                <mat-error>{{ 'CATEGORY_REQUIRED' | translate }}</mat-error>
-               }
-              @if(addCourseForm.get('category')?.hasError('min')){
-                <mat-error>{{ 'CATEGORY_POSITIVE' | translate }}</mat-error>
-              }
-            </mat-form-field>
 
-            <mat-form-field appearance="fill" class="form-field col-md-12">
-                <mat-label>{{ 'IMG_URL' | translate }}</mat-label>
-                <input matInput formControlName="imgUrl" required>
-                @if(addCourseForm.get('imgUrl')?.hasError('required')){
-                    <mat-error>{{ 'IMG_URL_REQUIRED' | translate }}</mat-error>
-                }
-            </mat-form-field>
-        </div>
+      <mat-form-field appearance="fill" class="form-field col-md-12">
+        <mat-label>{{ 'IMG_URL' | translate }}</mat-label>
+        <input matInput formControlName="imgUrl" required>
+        @if(addCourseForm.get('imgUrl')?.hasError('required')){
+          <mat-error>{{ 'IMG_URL_REQUIRED' | translate }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
 
-        <div class="form-row d-flex justify-content-start mb-1 mt-2">
-            <button mat-raised-button color="primary" type="submit" [disabled]="addCourseForm.invalid">
-                {{ ADD_OR_MODIFY_BUTTON | translate }}
-            </button>
-            
-        </div>
-    </form>
+    <div class="form-row d-flex justify-content-start mb-1 mt-2">
+      <button mat-raised-button color="primary" type="submit" [disabled]="addCourseForm.invalid">
+        {{ ADD_OR_MODIFY_BUTTON | translate }}
+      </button>
+
+    </div>
+  </form>
 </div>
