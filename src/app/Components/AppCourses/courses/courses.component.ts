@@ -28,7 +28,7 @@ export class CoursesComponent implements OnInit, OnDestroy {
     filteredCourses: Course[] = [];
     loadingData = false;
     searchTerm = '';
-    themeColor = 'primary';
+    themeColor = 'THEME_PRIMARY';
     pageSize = 4;
     currentPage = 0;
     totalPages = 0;
@@ -109,7 +109,7 @@ export class CoursesComponent implements OnInit, OnDestroy {
 
     // Utility
     getThemeColor(): string {
-        return this.themeColor === 'primary' ? '#003366' : '#b03060';
+        return this.themeColor === 'THEME_PRIMARY' ? '#003366' : '#b03060';
     }
 
     // Private Methods for Theme Management

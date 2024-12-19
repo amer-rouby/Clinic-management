@@ -25,7 +25,7 @@ export class PatientInstallmentsComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<any>([]); // Data source
   isLoading = false;
   searchTerm = '';
-  themeColor = 'primary';
+  themeColor = 'THEME_PRIMARY';
   private themeSubscription!: Subscription;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -119,6 +119,6 @@ export class PatientInstallmentsComponent implements OnInit, OnDestroy {
   }
 
   getThemeColor(): string {
-    return this.themeColor === 'primary' ? '#003366' : '#b03060';
+    return this.themeColor === 'THEME_PRIMARY' ? '#003366' : '#b03060';
   }
 }

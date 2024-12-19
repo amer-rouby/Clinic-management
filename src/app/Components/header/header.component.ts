@@ -16,14 +16,13 @@ import { LanguageService } from '../../Services/language.service';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   currentLang: string;
-  themeColor = 'primary';
+  themeColor = 'THEME_PRIMARY';
   private themeSubscription!: Subscription;
   private langSubscription!: Subscription;
 
   // Available options for theme and language
-  themeOptions = ['primary', 'accent'];
-  languages = ['en', 'ar'];
-
+  themeOptions = ['THEME_PRIMARY', 'THEME_ACCENT'];
+ 
   constructor(
     public themeService: ThemeService,
     private languageService: LanguageService,
@@ -83,7 +82,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   getThemeColor(): string {
-    return this.themeColor === 'primary' ? '#003366' : '#b03060';
+    return this.themeColor === 'THEME_PRIMARY' ? '#003366' : '#b03060';
   }
 
   private isBrowser(): boolean {
