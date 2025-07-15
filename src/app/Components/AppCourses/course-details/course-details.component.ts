@@ -18,7 +18,7 @@ import { PageNotFoundComponent } from '../../page-no-found/page-no-found.compone
 export class CourseDetailsComponent implements OnInit, OnDestroy {
   courseData!: Course;
   loadingData = false;
-  themeColor = 'primary';
+  themeColor = 'THEME_PRIMARY';
   private themeSubscription!: Subscription;
 
   constructor(
@@ -69,6 +69,6 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   }
 
   getThemeColor(): string {
-    return this.themeColor === 'primary' ? '#003366' : '#b03060';
+    return this.themeColor === 'THEME_PRIMARY' ? '#003366' : '#b03060';
   }
 }

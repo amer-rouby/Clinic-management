@@ -28,7 +28,7 @@ export class InstallmentDetailsDialogComponent implements OnInit {
   displayedColumns: string[] = ['dueDate', 'description', 'amount', 'actions'];
   isEditMode = false;
   showAddInstallment = false;
-  themeColor: string = 'primary';
+  themeColor: string = 'THEME_PRIMARY';
   currentInstallmentId: string | null = null;
   
   // Constants for button labels
@@ -200,6 +200,6 @@ export class InstallmentDetailsDialogComponent implements OnInit {
   }
 
   getThemeColor(): string {
-    return this.themeColor === 'primary' ? '#003366' : '#b03060';
+    return this.themeColor === 'THEME_PRIMARY' ? '#003366' : '#b03060';
   }
 }
