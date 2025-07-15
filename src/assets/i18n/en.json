@@ -108,8 +108,5 @@
     "CARD_SUBTITLE": "Card Subtitle",
     "ADD_DESCRIPTION": "Add Description ",
     "ADD_TITLE": "Add patient name",
-    "ADD_PHONE_NUMBER": "Add phone number",
-    "LANGUAGE": "Langage",
-    "ARABIC":"Arabic",
-    "ENGLISH":"English"
+    "ADD_PHONE_NUMBER": "Add phone number"
 }

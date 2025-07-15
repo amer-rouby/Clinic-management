@@ -106,8 +106,5 @@
     "COURSE_UPDATED_SUCCESS": "تم تحديث الدورة بنجاح!",
     "COURSE_ADDED_SUCCESS": "تمت إضافة الدورة بنجاح!",
     "COURSE_DELETED_SUCCESS": "تم حذف الدورة بنجاح!",
-    "CARD_SUBTITLE": "الترجمه للبطاقه",
-    "LANGUAGE": "اللغة",
-    "ARABIC": "العربية",
-    "ENGLISH": "الإنجليزية"
+    "CARD_SUBTITLE": "الترجمه للبطاقه"
 }

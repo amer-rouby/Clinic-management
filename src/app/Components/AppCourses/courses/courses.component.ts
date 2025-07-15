@@ -1,5 +1,6 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 
 import { Course } from '../../../Models/course.module';
@@ -9,7 +10,6 @@ import { CourseService } from '../../../Services/course.service';
 import { AddCourseComponent } from '../add-course/add-course.component';
 import { SharedMaterialModule } from '../../../../Shared/modules/shared.material.module';
 import { ThemeService } from '../../../Services/theme.service';
-import { DialogService } from '../../../Services/dialog.service';
 
 @Component({
     selector: 'app-courses',
@@ -22,57 +22,75 @@ import { DialogService } from '../../../Services/dialog.service';
     templateUrl: './courses.component.html',
     styleUrls: ['./courses.scss']
 })
-export class CoursesComponent implements OnInit, OnDestroy {
+export class CoursesComponent implements OnInit {
+
     courses: Course[] = [];
     pagedCourses: Course[] = [];
     filteredCourses: Course[] = [];
-    loadingData = false;
-    searchTerm = '';
-    themeColor = 'THEME_PRIMARY';
+
+    loadingData: boolean = false;
+    searchTerm: string = '';
+    themeColor: string = 'primary';
+    themeSubscription!: Subscription;
     pageSize = 4;
     currentPage = 0;
     totalPages = 0;
-
     @ViewChild(MatPaginator) paginator!: MatPaginator;
-    private themeSubscription!: Subscription;
 
     constructor(
-        private dialogService: DialogService,
+        public dialog: MatDialog,
         private courseService: CourseService,
-        private themeService: ThemeService
-    ) {}
+        public themeService: ThemeService
+    ) { }
 
     ngOnInit(): void {
         this.loadCourses();
-        this.subscribeToThemeChanges();
+        this.applyFilter(this.searchTerm);
+        this.themeSubscription = this.themeService.themeColor$.subscribe(color => {
+            this.themeColor = color;
+        });
     }
 
-    ngOnDestroy(): void {
-        this.unsubscribeFromThemeChanges();
+    ngOnDestroy(): void  {
+        if (this.themeSubscription) {
+            this.themeSubscription.unsubscribe();
+        }
     }
 
-    // Dialog Functions
+    // Dialog functions
     openDialog(): void {
-        this.dialogService.openDialog(AddCourseComponent, {}).subscribe(() => {
+        const dialogRef = this.dialog.open(AddCourseComponent, {
+            width: '800px',
+            height: "500px"
+        });
+        dialogRef.componentInstance.courseAdded.subscribe(() => {
             this.loadCourses();
         });
     }
 
     editCourse(course: Course): void {
-        this.dialogService.openDialog(AddCourseComponent, course).subscribe(() => {
+        const dialogRef = this.dialog.open(AddCourseComponent, {
+            width: '800px',
+            height: "500px",
+            data: course
+        });
+        dialogRef.componentInstance.courseAdded.subscribe(() => {
             this.loadCourses();
         });
     }
 
-    // Course Operations
+    // Course operations
     loadCourses(): void {
         this.loadingData = true;
         this.courseService.getAllCourses().subscribe(courses => {
             if (courses && courses.length) {
-                this.courses = [...courses];  // Ensures new reference for change detection
+                this.courses = courses.map(course => ({
+                    ...course,
+                    id: course.id // Assuming id is already present in each course object
+                }));
                 this.loadingData = false;
-                this.filteredCourses = [...this.courses]; // Initialize filtered courses
-                this.updatePagedCourses();
+                this.filteredCourses = this.courses;
+                this.updatePagedCourses(); // Update the paged courses
             }
         });
     }
@@ -101,27 +119,14 @@ export class CoursesComponent implements OnInit, OnDestroy {
         }
     }
 
-    // Event Handlers
+    // Event handlers
     onCourseClicked(updatedCourses: Course[]): void {
         this.courses = updatedCourses;
         this.applyFilter(this.searchTerm);
     }
 
     // Utility
-    getThemeColor(): string {
-        return this.themeColor === 'THEME_PRIMARY' ? '#003366' : '#b03060';
-    }
-
-    // Private Methods for Theme Management
-    private subscribeToThemeChanges(): void {
-        this.themeSubscription = this.themeService.themeColor$.subscribe(color => {
-            this.themeColor = color;
-        });
-    }
-
-    private unsubscribeFromThemeChanges(): void {
-        if (this.themeSubscription) {
-            this.themeSubscription.unsubscribe();
-        }
+    getThemeColor(): any {
+        return this.themeColor === 'primary' ? '#003366' : '#b03060';
     }
 }

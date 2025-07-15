@@ -10,10 +10,10 @@
         <ng-container matColumnDef="checkbox">
             <mat-header-cell *matHeaderCellDef>
                 <mat-checkbox (change)="selectAll($event)" [checked]="isAllSelected()"></mat-checkbox>
-                <button mat-icon-button (click)="loadDentalClinics()">
+                <button mat-icon-button (click)="loadDental()">
                     <mat-icon>refresh</mat-icon>
                 </button>
-                <button mat-icon-button (click)="openAddDentalClinicDialog()">
+                <button mat-icon-button (click)="openDialog()">
                     <mat-icon>add</mat-icon>
                 </button>
             </mat-header-cell>
@@ -55,7 +55,7 @@
             <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let newDental">
                 <button mat-mini-fab color="primary" [disabled]="!newDental.completed"
-                    (click)="openEditDentalClinicDialog(newDental)">
+                    (click)="editDentalClinicDialog(newDental)">
                     <mat-icon>edit</mat-icon>
                 </button>
             </mat-cell>
@@ -74,7 +74,7 @@
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     </mat-table>
-    <mat-paginator [length]="dentalClinics.length" [pageSize]="itemsPerPage" [pageSizeOptions]="[5, 10, 15, 20]"
+    <mat-paginator [length]="dental.length" [pageSize]="itemsPerPage" [pageSizeOptions]="[5, 10, 15, 20]"
         (page)="onPageChange($event)">
     </mat-paginator>
 </div>
