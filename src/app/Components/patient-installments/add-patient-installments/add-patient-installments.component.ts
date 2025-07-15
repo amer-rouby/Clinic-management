@@ -3,8 +3,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SharedMaterialModule } from '../../../../Shared/modules/shared.material.module';
 import { PatientInstallmentService } from '../../../Services/PatientInstallment.service';
-import { ToastrService } from 'ngx-toastr';
-import { TranslateService } from '@ngx-translate/core';
+import { ToastrService } from '../../../Services/toastr.service';
+import { TranslateService } from '../../../Services/translate.service';
 
 @Component({
   selector: 'app-add-edit-installment-dialog',
